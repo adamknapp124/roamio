@@ -20,7 +20,7 @@ export default function Page() {
 			video.play();
 			console.log(stream);
 
-			document.addEventListener('keypress', (e) => {
+			document.addEventListener('keypress', async (e) => {
 				if (e.code !== 'KeyK') return;
 
 				const canvas = document.createElement('canvas');
@@ -32,11 +32,42 @@ export default function Page() {
 					.getContext('2d')
 					.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
 
-				let imgData = canvas
+				let img = canvas
 					.toDataURL('image/png')
-					.replace('image/png', 'image/octet-stream');
+					.replace('data:image/png;base64,', '');
+				pictureElement.src = img;
 
-				pictureElement.src = imgData;
+				function chunkString(str, size) {
+					const chunks = [];
+					for (let i = 0; i < str.length; i += size) {
+						chunks.push(str.slice(i, i + size));
+					}
+					return chunks;
+				}
+
+				try {
+					const chunkedString = chunkString(img, 1000);
+					for (let chunk of chunkedString) {
+						const response = await fetch('http://localhost:4000/autosave', {
+							method: 'POST',
+							headers: {
+								'Content-Type': 'text/plain',
+							},
+							body: chunk,
+						});
+
+						if (response.ok) {
+							console.log('Image saved successfully');
+						} else {
+							console.error('Failed to save image');
+						}
+					}
+				} catch (error) {
+					console.error('Error saving image: ', error);
+				}
+
+				let imageToSave = pictureElement.src;
+				imageToSave = 'data:image/png;base64,' + img;
 			});
 		} catch (error) {
 			console.log(error);
