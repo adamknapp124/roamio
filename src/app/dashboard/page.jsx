@@ -47,11 +47,8 @@ export default function Page() {
 		<main>
 			<section>
 				<div>Dashboard</div>
-				<div>
-					<video id='video'></video>
-					<img src={null} alt='picture' className='picture' />
-				</div>
-
+				<video id='video'></video>
+				<img src={null} alt='picture' className='picture' />
 				<button onClick={videoStream}>Video</button>
 			</section>
 		</main>
