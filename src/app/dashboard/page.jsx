@@ -26,6 +26,7 @@ export default function Page() {
 			video: {
 				width: 400,
 				height: 200,
+				facingMode: 'environment',
 			},
 			audio: false,
 		});
@@ -65,6 +66,12 @@ export default function Page() {
 			<section>
 				<div>Dashboard</div>
 				<video id='video'></video>
+				{/* <input
+					type='file'
+					capture='camera'
+					accept='image/*'
+					id='cameraInput'
+					name='cameraInput'></input> */}
 				<picture></picture>
 				<img src={null} alt='picture' className='picture' />
 				<button onClick={videoStream}>Video</button>
