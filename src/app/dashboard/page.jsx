@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import styles from './dashboard.module.css';
 
 import axios from 'axios';
 
@@ -23,11 +24,7 @@ export default function Page() {
 		const video = document.querySelector('video');
 		const pictureElement = document.querySelector('.picture');
 		const stream = await navigator.mediaDevices.getUserMedia({
-			video: {
-				width: 400,
-				height: 200,
-				facingMode: 'environment',
-			},
+			video: true,
 			audio: false,
 		});
 
@@ -62,19 +59,15 @@ export default function Page() {
 	}
 
 	return (
-		<main>
+		<main className={styles.main}>
 			<section>
-				<div>Dashboard</div>
+				<div className={styles.justifyCenter}>Dashboard</div>
 				<video id='video'></video>
-				{/* <input
-					type='file'
-					capture='camera'
-					accept='image/*'
-					id='cameraInput'
-					name='cameraInput'></input> */}
 				<picture></picture>
 				<img src={null} alt='picture' className='picture' />
-				<button onClick={videoStream}>Video</button>
+				<button className={styles.justifyCenter} onClick={videoStream}>
+					Video
+				</button>
 			</section>
 		</main>
 	);

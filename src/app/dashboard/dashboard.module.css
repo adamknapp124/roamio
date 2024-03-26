@@ -1,0 +1,10 @@
+.main {
+	display: flex;
+	height: 100vh;
+	justify-content: center;
+}
+
+.justifyCenter {
+	display: flex;
+	justify-content: center;
+}
