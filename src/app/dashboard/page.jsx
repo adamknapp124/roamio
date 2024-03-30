@@ -1,73 +1,91 @@
 'use client';
 
-import React from 'react';
-import styles from './dashboard.module.css';
+import React, { useState, useEffect } from 'react';
 
 import axios from 'axios';
+import getPublicIds from '../libs/getPublicIds';
 
-export default function Page() {
-	async function uploadToCloudinary(blob) {
-		const instance = axios.create();
+export default function Page({}) {
+	const [file, setFile] = useState('');
+	const [image, setImage] = useState('');
+	const [uploadedImage, setUploadedImage] = useState('');
 
-		const data = new FormData();
-		data.append('file', blob);
-		data.append('cloud_name', 'dqh2jrg9q');
-		data.append('upload_preset', 'rjehvjob');
+	function previewFiles(file) {
+		// instantiate reader to asynchronously read contents of files
+		const reader = new FileReader();
+		reader.readAsDataURL(file);
 
-		const res = await instance.post(
-			'https://api.cloudinary.com/v1_1/dqh2jrg9q/image/upload/',
-			data
-		);
+		reader.onloadend = () => {
+			setImage(reader.result);
+		};
 	}
 
-	async function videoStream() {
-		const video = document.querySelector('video');
-		const pictureElement = document.querySelector('.picture');
-		const stream = await navigator.mediaDevices.getUserMedia({
-			video: true,
-			audio: false,
+	const handleChange = (e) => {
+		const file = e.target.files[0];
+		setFile(file);
+		previewFiles(file);
+	};
+
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		const result = await axios.post('http://localhost:4000/', {
+			image: image,
 		});
 
-		video.srcObject = stream;
-		video.play();
-		console.log(stream);
+		try {
+			const uploadedImage = result.data.public_id;
+			setUploadedImage(uploadedImage);
+			await axios.post('http://localhost:4000/add-photo', {
+				public_id: uploadedImage,
+			});
+		} catch (err) {
+			console.log('Error: ', err);
+		}
+	};
 
-		document.addEventListener('keypress', async (e) => {
-			try {
-				if (e.code !== 'KeyK') return;
+	// get public ids from database
+	const getPublicIds = async () => {
+		const result = await axios.get('http://localhost:4000/get-public-ids');
 
-				const canvas = document.createElement('canvas');
+		try {
+			const public_ids = result.data;
+			console.log(public_ids);
+		} catch (error) {
+			console.log(error);
+		}
+	};
 
-				canvas.width = video.videoWidth;
-				canvas.height = video.videoHeight;
-
-				canvas
-					.getContext('2d')
-					.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
-
-				const blob = await new Promise((resolve) =>
-					canvas.toBlob(resolve, 'image/png')
-				);
-
-				const imageURL = URL.createObjectURL(blob); // Convert blob to data URL
-				pictureElement.src = imageURL;
-				uploadToCloudinary(blob);
-			} catch (error) {
-				console.log(error);
-			}
-		});
-	}
+	useEffect(() => {
+		getPublicIds();
+	}, [getPublicIds]);
 
 	return (
-		<main className={styles.main}>
+		<main>
 			<section>
-				<div className={styles.justifyCenter}>Dashboard</div>
+				<div>Dashboard</div>
 				<video id='video'></video>
 				<picture></picture>
-				<img src={null} alt='picture' className='picture' />
-				<button className={styles.justifyCenter} onClick={videoStream}>
-					Video
-				</button>
+				<hr />
+				<img src={null} alt='picture' />
+				<button>Enable Camera</button>
+				<span>Press 'K' to take photo</span>
+			</section>
+			<section>
+				{/* Dont forget to build forms when you need to submit information */}
+				<form onSubmit={(e) => handleSubmit(e)}>
+					<label htmlFor='fileInput'>Upload Photo</label>
+					<input
+						type='file'
+						id='fileInput'
+						onChange={(e) => handleChange(e)}
+						required
+						accept='image/png, image/jpeg, image/jpg, image/jfif'
+					/>
+					<button>Submit</button>
+				</form>
+			</section>
+			<section>
+				<img src={image} alt='' />
 			</section>
 		</main>
 	);
