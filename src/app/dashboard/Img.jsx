@@ -1,7 +1,10 @@
 import React from 'react';
 
-const image = () => {
+import { Cloudinary } from '@cloudinary/url-gen';
+
+const Img = () => {
+	const cld = new Cloudinary({ cloud: { cloudName: 'roamio' } });
 	return <img></img>;
 };
 
-export default image;
+export default Img;
