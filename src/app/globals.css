@@ -69,6 +69,7 @@ section {
 
 .flex {
 	display: flex;
-	justify-content: space-between;
-	gap: 10px;
+	flex-wrap: wrap;
+	flex-grow: 1;
+	justify-content: center;
 }
