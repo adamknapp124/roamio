@@ -4,11 +4,13 @@ import React, { useState, useEffect } from 'react';
 
 import axios from 'axios';
 import getPublicIds from '../libs/getPublicIds';
+import Img from './Img';
 
 export default function Page({}) {
 	const [file, setFile] = useState('');
 	const [image, setImage] = useState('');
 	const [uploadedImage, setUploadedImage] = useState('');
+	const [publicIds, setPublicIds] = useState([]);
 
 	function previewFiles(file) {
 		// instantiate reader to asynchronously read contents of files
@@ -43,21 +45,25 @@ export default function Page({}) {
 		}
 	};
 
-	// get public ids from database
-	const getPublicIds = async () => {
-		const result = await axios.get('http://localhost:4000/get-public-ids');
+	useEffect(() => {
+		// get public ids from database
+		const getPublicIds = async () => {
+			try {
+				const result = await axios.get('http://localhost:4000/get-public-ids');
+				const public_ids = result.data;
+				console.log('ids: ', public_ids);
+				setPublicIds(public_ids);
+			} catch (error) {
+				console.log(error);
+			}
+		};
 
-		try {
-			const public_ids = result.data;
-			console.log(public_ids);
-		} catch (error) {
-			console.log(error);
-		}
-	};
+		getPublicIds(); // Call the getPublicIds function
+	}, []);
 
 	useEffect(() => {
-		getPublicIds();
-	}, [getPublicIds]);
+		console.log(publicIds); // Log the updated publicIds state
+	}, [publicIds]); // Run this effect whenever publicIds changes
 
 	return (
 		<main>
@@ -86,6 +92,8 @@ export default function Page({}) {
 			</section>
 			<section>
 				<img src={image} alt='' />
+				{publicIds &&
+					publicIds.map((pid) => <Img pid={pid.public_id} key={pid.id} />)}
 			</section>
 		</main>
 	);
