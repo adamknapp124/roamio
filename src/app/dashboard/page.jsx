@@ -43,6 +43,7 @@ export default function Page({}) {
 		} catch (err) {
 			console.log('Error: ', err);
 		}
+		setUploadedImage('');
 	};
 
 	useEffect(() => {
@@ -92,8 +93,10 @@ export default function Page({}) {
 			</section>
 			<section>
 				<img src={image} alt='' />
-				{publicIds &&
-					publicIds.map((pid) => <Img pid={pid.public_id} key={pid.id} />)}
+				<div className='flex'>
+					{publicIds &&
+						publicIds.map((pid) => <Img pid={pid.public_id} key={pid.id} />)}
+				</div>
 			</section>
 		</main>
 	);

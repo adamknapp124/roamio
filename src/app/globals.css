@@ -61,3 +61,14 @@ h6 {
 #__next {
 	isolation: isolate;
 }
+
+section {
+	width: 80%;
+	margin: auto;
+}
+
+.flex {
+	display: flex;
+	justify-content: space-between;
+	gap: 10px;
+}
