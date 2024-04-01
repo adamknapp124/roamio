@@ -52,7 +52,6 @@ export default function Page({}) {
 			try {
 				const result = await axios.get('http://localhost:4000/get-public-ids');
 				const public_ids = result.data;
-				console.log('ids: ', public_ids);
 				setPublicIds(public_ids);
 			} catch (error) {
 				console.log(error);
