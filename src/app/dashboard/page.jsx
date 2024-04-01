@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 
 import axios from 'axios';
-import getPublicIds from '../libs/getPublicIds';
 import Img from './Img';
 
 export default function Page({}) {
