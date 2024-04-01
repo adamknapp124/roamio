@@ -57,14 +57,11 @@ export default function Page({}) {
 			} catch (error) {
 				console.log(error);
 			}
+			setImage('');
 		};
 
 		getPublicIds(); // Call the getPublicIds function
-	}, []);
-
-	useEffect(() => {
-		console.log(publicIds); // Log the updated publicIds state
-	}, [publicIds]); // Run this effect whenever publicIds changes
+	}, [uploadedImage]);
 
 	return (
 		<main>
