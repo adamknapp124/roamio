@@ -1,15 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-
-import { Camera } from 'react-camera-pro';
+import React, { useState, useEffect } from 'react';
 
 import axios from 'axios';
 import Img from './Img';
 
 export default function Page({}) {
-	const camera = useRef(null);
-	const [cameraImage, setCameraImage] = useState(null);
 	const [file, setFile] = useState('');
 	const [image, setImage] = useState('');
 	const [uploadedImage, setUploadedImage] = useState('');
@@ -70,14 +66,6 @@ export default function Page({}) {
 			<section>
 				<div>Dashboard</div>
 				<hr />
-				<Camera ref={camera} />
-				<button
-					onClick={() => {
-						setCameraImage(camera.current.takePhoto());
-					}}>
-					Take Photo
-				</button>
-				<img serc={cameraImage} alt='photo' />
 			</section>
 			<section>
 				{/* Dont forget to build forms when you need to submit information */}
