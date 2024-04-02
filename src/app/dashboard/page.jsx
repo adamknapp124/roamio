@@ -11,6 +11,31 @@ export default function Page({}) {
 	const [uploadedImage, setUploadedImage] = useState('');
 	const [publicIds, setPublicIds] = useState([]);
 
+	// camera settings
+	const constraints = {
+		audio: false,
+		video: {
+			width: 500,
+			height: 300,
+		},
+	};
+
+	// create media object
+	const cameraOn = () => {
+		navigator.mediaDevices
+			.getUserMedia(constraints)
+			.then((mediaStream) => {
+				const video = document.querySelector('video');
+				video.srcObject = mediaStream;
+				video.onloadedmetadata = () => {
+					video.play();
+				};
+			})
+			.catch((err) => {
+				console.error(`${err.name}: ${err.message}`);
+			});
+	};
+
 	function previewFiles(file) {
 		// instantiate reader to asynchronously read contents of files
 		const reader = new FileReader();
@@ -66,6 +91,8 @@ export default function Page({}) {
 			<section>
 				<div>Dashboard</div>
 				<hr />
+				<video></video>
+				<button onClick={cameraOn}>Camera On</button>
 			</section>
 			<section>
 				{/* Dont forget to build forms when you need to submit information */}
