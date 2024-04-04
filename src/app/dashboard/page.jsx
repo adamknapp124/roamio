@@ -16,15 +16,16 @@ export default function Page({}) {
 	const constraints = {
 		audio: false,
 		video: {
-			width: 500,
-			height: 300,
+			width: 300,
+			height: 500,
 		},
 	};
 
-	// create media object
+	// Turns the camera on
 	const cameraOn = () => {
 		navigator.mediaDevices
 			.getUserMedia(constraints)
+			// Creates the mediaStream
 			.then((mediaStream) => {
 				const video = document.querySelector('video');
 				video.srcObject = mediaStream;
@@ -37,6 +38,7 @@ export default function Page({}) {
 			});
 	};
 
+	// Turns the camera off
 	const cameraOff = () => {
 		const video = document.querySelector('video');
 		const mediaStream = video.srcObject;
@@ -56,6 +58,7 @@ export default function Page({}) {
 		context.drawImage(video, 0, 0, canvas.width, canvas.height);
 		const dataURL = canvas.toDataURL('image/png');
 		setPhoto(dataURL);
+		console.log('photo: ', dataURL);
 	};
 
 	function previewFiles(file) {
@@ -92,6 +95,25 @@ export default function Page({}) {
 		setUploadedImage('');
 	};
 
+	const submitCameraPhoto = async (e) => {
+		e.preventDefault();
+
+		const result = await axios.post('http://localhost:4000/', {
+			image: photo,
+		});
+
+		try {
+			const uploadedImage = result.data.public_id;
+			setUploadedImage(uploadedImage),
+				await axios.post('http://localhost:4000/add-photo', {
+					public_id: uploadedImage,
+				});
+		} catch (err) {
+			console.log('Error: ', err);
+		}
+		setUploadedImage('');
+	};
+
 	useEffect(() => {
 		// get public ids from database
 		const getPublicIds = async () => {
@@ -110,13 +132,17 @@ export default function Page({}) {
 
 	return (
 		<main>
+			<div>Dashboard</div>
+			<hr />
 			<section>
-				<div>Dashboard</div>
-				<hr />
-				<video></video>
-				<img src={photo} alt={photo} />
+				<form onSubmit={submitCameraPhoto}>
+					<div className='center'>
+						<video></video>
+						<img src={photo} alt={photo} />
+					</div>
+					<button onClick={takePhoto}>Capture</button>
+				</form>
 				<button onClick={cameraOn}>Camera On</button>
-				<button onClick={takePhoto}>Capture</button>
 				<button onClick={cameraOff}>Camera Off</button>
 			</section>
 			<section>
@@ -134,7 +160,6 @@ export default function Page({}) {
 				</form>
 			</section>
 			<section>
-				<img src={image} alt='' />
 				<div className='flex'>
 					{publicIds &&
 						publicIds.map((pid) => <Img pid={pid.public_id} key={pid.id} />)}
