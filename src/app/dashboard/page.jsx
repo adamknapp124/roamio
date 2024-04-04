@@ -8,6 +8,7 @@ import Img from './Img';
 export default function Page({}) {
 	const [file, setFile] = useState('');
 	const [image, setImage] = useState('');
+	const [photo, setPhoto] = useState('');
 	const [uploadedImage, setUploadedImage] = useState('');
 	const [publicIds, setPublicIds] = useState([]);
 
@@ -34,6 +35,27 @@ export default function Page({}) {
 			.catch((err) => {
 				console.error(`${err.name}: ${err.message}`);
 			});
+	};
+
+	const cameraOff = () => {
+		const video = document.querySelector('video');
+		const mediaStream = video.srcObject;
+		if (mediaStream) {
+			const tracks = mediaStream.getTracks();
+			tracks.forEach((track) => track.stop());
+			video.srcObject = null;
+		}
+	};
+
+	const takePhoto = () => {
+		const video = document.querySelector('video');
+		const canvas = document.createElement('canvas');
+		canvas.width = video.videoWidth;
+		canvas.height = video.videoHeight;
+		const context = canvas.getContext('2d');
+		context.drawImage(video, 0, 0, canvas.width, canvas.height);
+		const dataURL = canvas.toDataURL('image/png');
+		setPhoto(dataURL);
 	};
 
 	function previewFiles(file) {
@@ -92,7 +114,10 @@ export default function Page({}) {
 				<div>Dashboard</div>
 				<hr />
 				<video></video>
+				<img src={photo} alt={photo} />
 				<button onClick={cameraOn}>Camera On</button>
+				<button onClick={takePhoto}>Capture</button>
+				<button onClick={cameraOff}>Camera Off</button>
 			</section>
 			<section>
 				{/* Dont forget to build forms when you need to submit information */}
