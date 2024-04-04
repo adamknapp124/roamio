@@ -1,19 +1,65 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-
-import { Camera } from 'react-camera-pro';
+import React, { useState, useEffect } from 'react';
 
 import axios from 'axios';
 import Img from './Img';
 
 export default function Page({}) {
-	const camera = useRef(null);
-	const [cameraImage, setCameraImage] = useState(null);
 	const [file, setFile] = useState('');
 	const [image, setImage] = useState('');
+	const [photo, setPhoto] = useState('');
 	const [uploadedImage, setUploadedImage] = useState('');
 	const [publicIds, setPublicIds] = useState([]);
+
+	// camera settings
+	const constraints = {
+		audio: false,
+		video: {
+			width: 300,
+			height: 500,
+		},
+	};
+
+	// Turns the camera on
+	const cameraOn = () => {
+		navigator.mediaDevices
+			.getUserMedia(constraints)
+			// Creates the mediaStream
+			.then((mediaStream) => {
+				const video = document.querySelector('video');
+				video.srcObject = mediaStream;
+				video.onloadedmetadata = () => {
+					video.play();
+				};
+			})
+			.catch((err) => {
+				console.error(`${err.name}: ${err.message}`);
+			});
+	};
+
+	// Turns the camera off
+	const cameraOff = () => {
+		const video = document.querySelector('video');
+		const mediaStream = video.srcObject;
+		if (mediaStream) {
+			const tracks = mediaStream.getTracks();
+			tracks.forEach((track) => track.stop());
+			video.srcObject = null;
+		}
+	};
+
+	const takePhoto = () => {
+		const video = document.querySelector('video');
+		const canvas = document.createElement('canvas');
+		canvas.width = video.videoWidth;
+		canvas.height = video.videoHeight;
+		const context = canvas.getContext('2d');
+		context.drawImage(video, 0, 0, canvas.width, canvas.height);
+		const dataURL = canvas.toDataURL('image/png');
+		setPhoto(dataURL);
+		console.log('photo: ', dataURL);
+	};
 
 	function previewFiles(file) {
 		// instantiate reader to asynchronously read contents of files
@@ -49,6 +95,25 @@ export default function Page({}) {
 		setUploadedImage('');
 	};
 
+	const submitCameraPhoto = async (e) => {
+		e.preventDefault();
+
+		const result = await axios.post('http://localhost:4000/', {
+			image: photo,
+		});
+
+		try {
+			const uploadedImage = result.data.public_id;
+			setUploadedImage(uploadedImage),
+				await axios.post('http://localhost:4000/add-photo', {
+					public_id: uploadedImage,
+				});
+		} catch (err) {
+			console.log('Error: ', err);
+		}
+		setUploadedImage('');
+	};
+
 	useEffect(() => {
 		// get public ids from database
 		const getPublicIds = async () => {
@@ -67,17 +132,18 @@ export default function Page({}) {
 
 	return (
 		<main>
+			<div>Dashboard</div>
+			<hr />
 			<section>
-				<div>Dashboard</div>
-				<hr />
-				<Camera ref={camera} />
-				<button
-					onClick={() => {
-						setCameraImage(camera.current.takePhoto());
-					}}>
-					Take Photo
-				</button>
-				<img serc={cameraImage} alt='photo' />
+				<form onSubmit={submitCameraPhoto}>
+					<div className='center'>
+						<video></video>
+						<img src={photo} alt={photo} />
+					</div>
+					<button onClick={takePhoto}>Capture</button>
+				</form>
+				<button onClick={cameraOn}>Camera On</button>
+				<button onClick={cameraOff}>Camera Off</button>
 			</section>
 			<section>
 				{/* Dont forget to build forms when you need to submit information */}
@@ -94,7 +160,6 @@ export default function Page({}) {
 				</form>
 			</section>
 			<section>
-				<img src={image} alt='' />
 				<div className='flex'>
 					{publicIds &&
 						publicIds.map((pid) => <Img pid={pid.public_id} key={pid.id} />)}

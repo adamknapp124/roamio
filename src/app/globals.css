@@ -73,3 +73,8 @@ section {
 	flex-grow: 1;
 	justify-content: center;
 }
+
+.center {
+	width: 100%;
+	margin: auto;
+}
