@@ -81,12 +81,15 @@ export default function Page({}) {
 		e.preventDefault();
 
 		try {
-			const result = await axios.post('https://roamio-backend.vercel.app/', {
-				image: image,
-			});
+			const result = await axios.post(
+				'https://https://roamio-backend.vercel.app/',
+				{
+					image: image,
+				}
+			);
 			const uploadedImage = result.data.public_id;
 			setUploadedImage(uploadedImage);
-			await axios.post('https://roamio-backend.vercel.app/add-photo', {
+			await axios.post('https://https://roamio-backend.vercel.app/add-photo', {
 				public_id: uploadedImage,
 			});
 		} catch (err) {
@@ -99,12 +102,12 @@ export default function Page({}) {
 		e.preventDefault();
 
 		try {
-			const result = await axios.post('https://roamio-backend.vercel.app/', {
+			const result = await axios.post('/', {
 				image: photo,
 			});
 			const uploadedImage = result.data.public_id;
 			setUploadedImage(uploadedImage),
-				await axios.post('https://roamio-backend.vercel.app/add-photo/', {
+				await axios.post('https://https://roamio-backend.vercel.app/add-photo/', {
 					public_id: uploadedImage,
 				});
 		} catch (err) {
@@ -118,7 +121,7 @@ export default function Page({}) {
 		const getPublicIds = async () => {
 			try {
 				const result = await axios.get(
-					'https://roamio-backend.vercel.app/get-public-ids'
+					'https://https://roamio-backend.vercel.app/get-public-ids'
 				);
 				const public_ids = result.data;
 				setPublicIds(public_ids);
