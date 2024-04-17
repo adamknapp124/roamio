@@ -72,9 +72,20 @@ export default function Page({}) {
 				},
 			}
 		);
-
+		getPublicIds();
 		console.log(response.data);
 	};
+
+	// Gets the public_ids from the database when a new photo is stored
+	const getPublicIds = async () => {
+		const response = await axios.get('http://localhost:2323/getPublicIds');
+		console.log(response.data);
+	};
+
+	// Gets the public_ids from the database when the component loads
+	useEffect(() => {
+		getPublicIds();
+	}, [photo]);
 
 	return (
 		<main>
@@ -112,6 +123,7 @@ export default function Page({}) {
 				</div>
 			</section>
 			<button onClick={storePhoto}>Store</button>
+			<button onClick={getPublicIds}>get Ids</button>
 		</main>
 	);
 }
