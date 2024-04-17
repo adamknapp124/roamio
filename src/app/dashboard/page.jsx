@@ -21,11 +21,9 @@ export default function Page({}) {
 		},
 	};
 
-	// Turns the camera on
 	const cameraOn = () => {
 		navigator.mediaDevices
 			.getUserMedia(constraints)
-			// Creates the mediaStream
 			.then((mediaStream) => {
 				const video = document.querySelector('video');
 				video.srcObject = mediaStream;
@@ -38,7 +36,6 @@ export default function Page({}) {
 			});
 	};
 
-	// Turns the camera off
 	const cameraOff = () => {
 		const video = document.querySelector('video');
 		const mediaStream = video.srcObject;
@@ -49,7 +46,8 @@ export default function Page({}) {
 		}
 	};
 
-	const takePhoto = () => {
+	const takePhoto = (e) => {
+		e.preventDefault();
 		const video = document.querySelector('video');
 		const canvas = document.createElement('canvas');
 		canvas.width = video.videoWidth;
@@ -58,85 +56,32 @@ export default function Page({}) {
 		context.drawImage(video, 0, 0, canvas.width, canvas.height);
 		const dataURL = canvas.toDataURL('image/png');
 		setPhoto(dataURL);
-		console.log('photo: ', dataURL);
+		setUploadedImage(dataURL);
 	};
 
-	function previewFiles(file) {
-		// instantiate reader to asynchronously read contents of files
-		const reader = new FileReader();
-		reader.readAsDataURL(file);
-
-		reader.onloadend = () => {
-			setImage(reader.result);
-		};
-	}
-
-	const handleChange = (e) => {
-		const file = e.target.files[0];
-		setFile(file);
-		previewFiles(file);
-	};
-
-	const handleSubmit = async (e) => {
-		e.preventDefault();
-
-		try {
-			const result = await axios.post('https://roamio-vercel-backend.vercel.app/', {
-				image: image,
-			});
-			const uploadedImage = result.data.public_id;
-			setUploadedImage(uploadedImage);
-			await axios.post('https://roamio-vercel-backend.vercel.app/add-photo', {
-				public_id: uploadedImage,
-			});
-		} catch (err) {
-			console.log('Error: ', err);
-		}
-		setUploadedImage('');
-	};
-
-	const submitCameraPhoto = async (e) => {
-		e.preventDefault();
-
-		try {
-			const result = await axios.post('/', {
-				image: photo,
-			});
-			const uploadedImage = result.data.public_id;
-			setUploadedImage(uploadedImage),
-				await axios.post('https://roamio-vercel-backend.vercel.app/add-photo/', {
-					public_id: uploadedImage,
-				});
-		} catch (err) {
-			console.log('Error: ', err);
-		}
-		setUploadedImage('');
-	};
-
-	useEffect(() => {
-		// get public ids from database
-		const getPublicIds = async () => {
-			try {
-				const result = await axios.get(
-					'https://roamio-vercel-backend.vercel.app/get-public-ids'
-				);
-				const public_ids = result.data;
-				setPublicIds(public_ids);
-			} catch (error) {
-				console.log(error);
+	const storePhoto = async () => {
+		const photo = uploadedImage;
+		const response = await axios.post(
+			'http://localhost:2323/uploadToCloudinary',
+			{
+				photo: photo,
+			},
+			{
+				headers: {
+					'Content-Type': 'application/json',
+				},
 			}
-			setImage('');
-		};
+		);
 
-		getPublicIds(); // Call the getPublicIds function
-	}, [uploadedImage]);
+		console.log(response.data);
+	};
 
 	return (
 		<main>
 			<div>Dashboard</div>
 			<hr />
 			<section>
-				<form onSubmit={submitCameraPhoto}>
+				<form>
 					<div className='center'>
 						<video></video>
 						<img src={photo} alt={photo} />
@@ -166,6 +111,7 @@ export default function Page({}) {
 						publicIds.map((pid) => <Img pid={pid.public_id} key={pid.id} />)}
 				</div>
 			</section>
+			<button onClick={storePhoto}>Store</button>
 		</main>
 	);
 }
