@@ -21,6 +21,7 @@ export default function Page({}) {
 		},
 	};
 
+	// Turns camera... on.
 	const cameraOn = () => {
 		navigator.mediaDevices
 			.getUserMedia(constraints)
@@ -36,6 +37,7 @@ export default function Page({}) {
 			});
 	};
 
+	// Turns camera... off.
 	const cameraOff = () => {
 		const video = document.querySelector('video');
 		const mediaStream = video.srcObject;
@@ -46,6 +48,7 @@ export default function Page({}) {
 		}
 	};
 
+	// Takes a still photo with the webcam and previews it on the page
 	const takePhoto = (e) => {
 		e.preventDefault();
 		const video = document.querySelector('video');
@@ -59,6 +62,7 @@ export default function Page({}) {
 		setUploadedImage(dataURL);
 	};
 
+	// Stores the photos taken with webcams to cloudinary
 	const storePhoto = async () => {
 		const photo = uploadedImage;
 		const response = await axios.post(
